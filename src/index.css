@@ -188,6 +188,13 @@ label {
   overflow-y: auto;
 }
 
+.error {
+  text-align: center;
+  color: #e6425e;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
 @media (max-width: 450px) {
 
   .top_card,
