@@ -1,0 +1,16 @@
+{
+  "transactions": [
+    {
+      "name": "Salary from Meta",
+      "type": "income",
+      "amount": 1000000,
+      "id": 1
+    },
+    {
+      "name": "test",
+      "type": "expense",
+      "amount": 500000,
+      "id": 2
+    }
+  ]
+}

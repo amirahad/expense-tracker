@@ -1,14 +1,36 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createTransaction } from '../../redux/features/transactionSlice'
+import { createTransaction, editTransaction } from '../../redux/features/transactionSlice'
 
 export default function Form() {
-    const [name, setName] = useState('')
-    const [type, setType] = useState('')
+    const [editMode, setEditMode] = useState(false)
+    const [name, setName] = useState("")
+    const [type, setType] = useState("")
     const [amount, setAmount] = useState('')
+
     const dispatch = useDispatch()
 
     const { isLoading, isError, errorMessage } = useSelector(state => state.transaction)
+    const { editing } = useSelector(state => state.transaction)
+
+    useEffect(() => {
+        const { id, name, type, amount } = editing || {}
+        if (id) {
+            setEditMode(true)
+            setName(name)
+            setType(type)
+            setAmount(amount)
+        } else {
+            setEditMode(false)
+            reset()
+        }
+    }, [editing])
+
+    const reset = () => {
+        setName('')
+        setType('')
+        setAmount(0)
+    }
 
     const handleCreate = (e) => {
         e.preventDefault()
@@ -18,9 +40,28 @@ export default function Form() {
             amount: parseInt(amount)
         }
         dispatch(createTransaction(newTransaction))
-        setName('')
-        setType('')
-        setAmount(0)
+        reset()
+    }
+
+    const cancelEdit = () => {
+        setEditMode(false)
+        reset()
+    }
+
+    const handleUpdate = (e) => {
+        e.preventDefault()
+        dispatch(
+            editTransaction({
+                id: editing.id,
+                data: {
+                    name,
+                    type,
+                    amount: parseInt(amount)
+                }
+            })
+        )
+        reset()
+        setEditMode(false)
     }
 
     return (
@@ -29,7 +70,7 @@ export default function Form() {
 
             {isError && !isLoading && <p className="error">{errorMessage}</p>}
 
-            <form onSubmit={handleCreate}>
+            <form onSubmit={editMode ? handleUpdate : handleCreate}>
                 <div className="form-group">
                     <label>Name</label>
                     <input
@@ -50,8 +91,8 @@ export default function Form() {
                             type="radio"
                             value="income"
                             name="type"
-                            cheched={type === "income"}
-                            onChange={(e) => setType(e.target.value)}
+                            checked={type === "income"}
+                            onChange={(e) => setType("income")}
                         />
                         <label>Income</label>
                     </div>
@@ -61,8 +102,8 @@ export default function Form() {
                             value="expense"
                             name="type"
                             placeholder="Expense"
-                            cheched={type === "expense"}
-                            onChange={(e) => setType(e.target.value)}
+                            checked={type === "expense"}
+                            onChange={(e) => setType("expense")}
                         />
                         <label>Expense</label>
                     </div>
@@ -84,13 +125,14 @@ export default function Form() {
                     className="btn"
                     type='submit'
                     disabled={isLoading}
+                    onClick={editMode ? handleUpdate : handleCreate}
                 >
-                    Add Transaction
+                    {editMode ? "Update Transaction" : "Add Transaction"}
                 </button>
 
             </form>
 
-            <button className="btn cancel_edit">Cancel Edit</button>
+            {editMode && <button className="btn cancel_edit" onClick={cancelEdit}>Cancel Edit</button>}
         </div>
     )
 }

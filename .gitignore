@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+#ignore the node_modules inside server
+/server/node_modules
 /.pnp
 .pnp.js
 
